@@ -13,6 +13,7 @@ import (
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	genesisMock "github.com/multiversx/mx-chain-go/genesis/mock"
 	"github.com/multiversx/mx-chain-go/testscommon"
+	"github.com/multiversx/mx-chain-go/testscommon/cache"
 	"github.com/multiversx/mx-sdk-go/authentication"
 	"github.com/multiversx/mx-sdk-go/authentication/native/mock"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -102,7 +103,7 @@ func TestNativeserver_Validate(t *testing.T) {
 		t.Parallel()
 
 		args := createMockArgsNativeAuthServer()
-		args.TimestampsCacher = &testscommon.CacherStub{
+		args.TimestampsCacher = &cache.CacherStub{
 			GetCalled: func(key []byte) (value interface{}, ok bool) {
 				assert.Equal(t, []byte(providedBlockHash), key)
 				return "invalid value", true
@@ -339,7 +340,7 @@ func TestNativeserver_Validate(t *testing.T) {
 				return nil
 			},
 		}
-		args.TimestampsCacher = &testscommon.CacherStub{
+		args.TimestampsCacher = &cache.CacherStub{
 			GetCalled: func(key []byte) (value interface{}, ok bool) {
 				assert.Equal(t, []byte(providedBlockHash), key)
 				return blockTimestamp, true
@@ -365,6 +366,6 @@ func createMockArgsNativeAuthServer() ArgsNativeAuthServer {
 		Signer:            &testsCommon.SignerStub{},
 		PubKeyConverter:   &testscommon.PubkeyConverterStub{},
 		KeyGenerator:      &genesisMock.KeyGeneratorStub{},
-		TimestampsCacher:  &testscommon.CacherStub{},
+		TimestampsCacher:  &cache.CacherStub{},
 	}
 }
