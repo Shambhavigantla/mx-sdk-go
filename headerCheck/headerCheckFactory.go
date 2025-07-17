@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"github.com/multiversx/mx-chain-core-go/core/check"
+	"github.com/multiversx/mx-chain-go/config"
+	"github.com/multiversx/mx-chain-go/dataRetriever/dataPool/headersCache"
+	proofscache "github.com/multiversx/mx-chain-go/dataRetriever/dataPool/proofsCache"
 	"github.com/multiversx/mx-chain-go/factory/crypto"
 	"github.com/multiversx/mx-chain-go/process/headerCheck"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -65,10 +68,21 @@ func NewHeaderCheckHandler(
 		enableEpochsConfig,
 		cryptoComp.PublicKey,
 		genesisNodesConfig,
+		coreComp.ChainParametersHolder,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	headersPool, err := headersCache.NewHeadersPool(config.HeadersPoolConfig{
+		MaxHeadersPerShard:            1000,
+		NumElementsToRemoveOnEviction: 100,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	proofsPool := proofscache.NewProofsPool(3, 1000)
 
 	headerSigArgs := &headerCheck.ArgsHeaderSigVerifier{
 		Marshalizer:             coreComp.Marshaller,
@@ -78,6 +92,10 @@ func NewHeaderCheckHandler(
 		SingleSigVerifier:       cryptoComp.SingleSig,
 		KeyGen:                  cryptoComp.KeyGen,
 		FallbackHeaderValidator: &disabled.FallBackHeaderValidator{},
+		EnableEpochsHandler:     coreComp.EnableEpochsHandler,
+		HeadersPool:             headersPool,
+		ProofsPool:              proofsPool,
+		StorageService:          &disabled.StorageService{},
 	}
 	headerSigVerifier, err := headerCheck.NewHeaderSigVerifier(headerSigArgs)
 	if err != nil {
