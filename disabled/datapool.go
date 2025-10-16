@@ -54,7 +54,7 @@ func (dp *DataPool) MiniBlocks() storage.Cacher {
 	return nil
 }
 
-//PeerChangesBlocks returns nil
+// PeerChangesBlocks returns nil
 func (dp *DataPool) PeerChangesBlocks() storage.Cacher {
 	return nil
 }
@@ -81,6 +81,11 @@ func (dp *DataPool) CurrentEpochValidatorInfo() dataRetriever.ValidatorInfoCache
 
 // ValidatorsInfo returns nil
 func (dp *DataPool) ValidatorsInfo() dataRetriever.ShardedDataCacherNotifier {
+	return nil
+}
+
+// Proofs returns nil
+func (dp *DataPool) Proofs() dataRetriever.ProofsPool {
 	return nil
 }
 
