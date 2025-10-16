@@ -3,12 +3,13 @@ package testsCommon
 import (
 	"github.com/multiversx/mx-chain-go/sharding/nodesCoordinator"
 	"github.com/multiversx/mx-chain-go/state"
+	"github.com/multiversx/mx-chain-go/testscommon/shardingMocks"
 )
 
 // NodesCoordinatorStub -
 type NodesCoordinatorStub struct {
-	ComputeValidatorsGroupCalled                      func(randomness []byte, round uint64, shardId uint32, epoch uint32) ([]nodesCoordinator.Validator, error)
-	GetValidatorsPublicKeysCalled                     func(randomness []byte, round uint64, shardId uint32, epoch uint32) ([]string, error)
+	ComputeValidatorsGroupCalled                      func(randomness []byte, round uint64, shardId uint32, epoch uint32) (leader nodesCoordinator.Validator, validatorsGroup []nodesCoordinator.Validator, err error)
+	GetValidatorsPublicKeysCalled                     func(randomness []byte, round uint64, shardId uint32, epoch uint32) (string, []string, error)
 	GetValidatorsRewardsAddressesCalled               func(randomness []byte, round uint64, shardId uint32, epoch uint32) ([]string, error)
 	GetValidatorWithPublicKeyCalled                   func(publicKey []byte) (validator nodesCoordinator.Validator, shardId uint32, err error)
 	GetAllValidatorsPublicKeysCalled                  func() (map[uint32][][]byte, error)
@@ -18,6 +19,17 @@ type NodesCoordinatorStub struct {
 	GetAllShuffledOutValidatorsPublicKeysCalled       func(epoch uint32) (map[uint32][][]byte, error)
 	GetWaitingEpochsLeftForPublicKeyCalled            func(publicKey []byte) (uint32, error)
 	GetShuffledOutToAuctionValidatorsPublicKeysCalled func(epoch uint32) (map[uint32][][]byte, error)
+	GetAllEligibleValidatorsPublicKeysForShardCalled  func(epoch uint32, shardID uint32) ([]string, error)
+}
+
+func (ncm *NodesCoordinatorStub) ConsensusGroupSizeForShardAndEpoch(u uint32, u2 uint32) int {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (ncm *NodesCoordinatorStub) GetCachedEpochs() map[uint32]struct{} {
+	// TODO implement me
+	panic("implement me")
 }
 
 // GetChance -
@@ -80,7 +92,7 @@ func (ncm *NodesCoordinatorStub) ComputeConsensusGroup(
 	round uint64,
 	shardId uint32,
 	epoch uint32,
-) (validatorsGroup []nodesCoordinator.Validator, err error) {
+) (nodesCoordinator.Validator, []nodesCoordinator.Validator, error) {
 
 	if ncm.ComputeValidatorsGroupCalled != nil {
 		return ncm.ComputeValidatorsGroupCalled(randomness, round, shardId, epoch)
@@ -88,7 +100,16 @@ func (ncm *NodesCoordinatorStub) ComputeConsensusGroup(
 
 	var list []nodesCoordinator.Validator
 
-	return list, nil
+	return &shardingMocks.ValidatorMock{}, list, nil
+}
+
+// GetAllEligibleValidatorsPublicKeysForShard -
+func (ncm *NodesCoordinatorStub) GetAllEligibleValidatorsPublicKeysForShard(epoch uint32, shardID uint32) ([]string, error) {
+	if ncm.GetAllEligibleValidatorsPublicKeysForShardCalled != nil {
+		return ncm.GetAllEligibleValidatorsPublicKeysForShardCalled(epoch, shardID)
+	}
+
+	return []string{}, nil
 }
 
 // ConsensusGroupSize -
@@ -105,12 +126,12 @@ func (ncm *NodesCoordinatorStub) GetConsensusValidatorsPublicKeys(
 	round uint64,
 	shardId uint32,
 	epoch uint32,
-) ([]string, error) {
+) (string, []string, error) {
 	if ncm.GetValidatorsPublicKeysCalled != nil {
 		return ncm.GetValidatorsPublicKeysCalled(randomness, round, shardId, epoch)
 	}
 
-	return nil, nil
+	return "", nil, nil
 }
 
 // SetNodesPerShards -

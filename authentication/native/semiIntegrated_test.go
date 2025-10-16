@@ -10,7 +10,7 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
-	"github.com/multiversx/mx-chain-go/testscommon"
+	"github.com/multiversx/mx-chain-go/testscommon/cache"
 	"github.com/multiversx/mx-sdk-go/authentication"
 	"github.com/multiversx/mx-sdk-go/blockchain/cryptoProvider"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -88,7 +88,7 @@ func createNativeServer(httpClientWrapper authentication.HttpClientWrapper, toke
 		Signer:            &testsCommon.SignerStub{},
 		PubKeyConverter:   converter,
 		KeyGenerator:      keyGen,
-		TimestampsCacher:  testscommon.NewCacherMock(),
+		TimestampsCacher:  cache.NewCacherMock(),
 	}
 	server, _ := NewNativeAuthServer(serverArgs)
 
